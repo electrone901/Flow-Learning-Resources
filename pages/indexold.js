@@ -81,30 +81,8 @@ export default function Home({ Component, pageProps, router }) {
     console.log('Transaction Id', transactionId)
   }
 
-  const theme = extendTheme({
-    styles: {
-      global: {
-        'html,body': {
-          backgroundColor: '#000113',
-        },
-        '*': {
-          fontFamily: 'DM Sans',
-          color: 'white',
-          backgroundColor: 'transparent',
-        },
-        button: {
-          backgroundColor: 'transparent !important',
-          border: '1px solid gray',
-          _hover: {
-            border: '1px solid lightgray',
-          },
-        },
-      },
-    },
-  })
-
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider>
       <div className="bg-[#011E30] flex flex-col min-h-screen">
         <Head>
           <title>Flow Learning Resources</title>
@@ -116,7 +94,7 @@ export default function Home({ Component, pageProps, router }) {
         <br />
 
         {/* <Component {...pageProps} key={router} /> */}
-        {/* <Component {...pageProps} key={router} /> */}
+        <Component {...pageProps} key={router} />
         <main className="container mx-auto flex-1 p-5">
           <div className="flex items-center justify-center pt-28">
             <div className="space-y-5 p-2 w-1/3">
