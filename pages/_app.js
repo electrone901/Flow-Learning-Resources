@@ -47,7 +47,7 @@ function MyApp({ Component, pageProps, router }) {
       .put('flow.network', 'testnet')
       .put('accessNode.api', 'https://rest-testnet.onflow.org')
       .put('discovery.wallet', 'https://fcl-discovery.onflow.org/testnet/authn')
-      .put('app.detail.title', 'Test Harness')
+      .put('app.detail.title', 'Flow Bounty Hunter')
       .put('app.detail.icon', 'https://i.imgur.com/r23Zhvu.png')
       .put('0xFlowToken', '0x7e60df042a9c0868')
   }, [])
