@@ -11,9 +11,6 @@ import '../flow/config.js'
 function Explore({ user, setSelectedTask }) {
   const router = useRouter()
   const [allTasks, setAllTasks] = useState([])
-  const [greeting, setGreeting] = useState('')
-  console.log('🚀 ~ file: tasks.js:16 ~ Explore ~ greeting:', greeting)
-  const [newGreeting, setNewGreeting] = useState('')
 
   useEffect(() => {
     if (user.loggedIn) {
@@ -170,52 +167,52 @@ function Explore({ user, setSelectedTask }) {
     setAllTasks(data)
   }
 
-  async function addTask() {
-    const transactionId = await fcl.mutate({
-      cadence: `
-      import TasksList from 0xDeployer
-      transaction(newURL: String) {
-        prepare(signer: AuthAccount) {
-        }
-        execute {
-          TasksList.addTask(newURL: newURL)
-        }
-      }
-      `,
-      args: (arg, t) => [arg(newGreeting, t.String)],
-      proposer: fcl.authz,
-      payer: fcl.authz,
-      authorizations: [fcl.authz],
-      limit: 999,
-    })
+  // async function addTask() {
+  //   const transactionId = await fcl.mutate({
+  //     cadence: `
+  //     import TasksList from 0xDeployer
+  //     transaction(newURL: String) {
+  //       prepare(signer: AuthAccount) {
+  //       }
+  //       execute {
+  //         TasksList.addTask(newURL: newURL)
+  //       }
+  //     }
+  //     `,
+  //     args: (arg, t) => [arg(newGreeting, t.String)],
+  //     proposer: fcl.authz,
+  //     payer: fcl.authz,
+  //     authorizations: [fcl.authz],
+  //     limit: 999,
+  //   })
 
-    console.log('Transaction Id IS THIS ONE', transactionId)
-  }
+  //   console.log('Transaction Id IS THIS ONE', transactionId)
+  // }
 
-  async function changeGreeting() {
-    const transactionId = await fcl.mutate({
-      cadence: `
-      import HelloWorld from 0xDeployer
+  // async function changeGreeting() {
+  //   const transactionId = await fcl.mutate({
+  //     cadence: `
+  //     import HelloWorld from 0xDeployer
 
-      transaction(newGreeting: String) {
-        prepare(signer: AuthAccount) {
+  //     transaction(newGreeting: String) {
+  //       prepare(signer: AuthAccount) {
 
-        }
+  //       }
 
-        execute {
-          HelloWorld.changeGreeting(newGreeting: newGreeting)
-        }
-      }
-      `,
-      args: (arg, t) => [arg(newGreeting, t.String)],
-      proposer: fcl.authz,
-      payer: fcl.authz,
-      authorizations: [fcl.authz],
-      limit: 999,
-    })
+  //       execute {
+  //         HelloWorld.changeGreeting(newGreeting: newGreeting)
+  //       }
+  //     }
+  //     `,
+  //     args: (arg, t) => [arg(newGreeting, t.String)],
+  //     proposer: fcl.authz,
+  //     payer: fcl.authz,
+  //     authorizations: [fcl.authz],
+  //     limit: 999,
+  //   })
 
-    console.log('Transaction Id', transactionId)
-  }
+  //   console.log('Transaction Id', transactionId)
+  // }
 
   function handleClick(task) {
     console.log('1 task', task)

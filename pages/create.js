@@ -110,7 +110,7 @@ function Create({ user }) {
           level: level ? level : 1,
           creator: user.addr ? user.addr : '0xb74a263c8ad544b5',
           subscriptionFee: subscriptionFee ? subscriptionFee : '0.00',
-          questionsArray: dummyData,
+          questionsArray: data ? data : dummyData,
         }
 
         const client = new NFTStorage({ token: apiKey })
