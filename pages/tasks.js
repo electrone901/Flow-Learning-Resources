@@ -137,8 +137,7 @@ function Explore({ user, setSelectedTask }) {
       .put('0xFlowToken', '0x7e60df042a9c0868')
     const result = await fcl.query({
       cadence: `
-      import TasksList from 0xDeployer
-
+      import FlowToken from 0xf233dcee88fe0abe
       pub fun main(): [String] {
         return TasksList.tasks
       }
