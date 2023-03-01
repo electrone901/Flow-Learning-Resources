@@ -196,7 +196,7 @@ export default function Quiz({
                 }}
                 onClick={claimRewards}
               >
-                Claim Rewards
+                Claimed Rewards
               </Button>
 
               <p
