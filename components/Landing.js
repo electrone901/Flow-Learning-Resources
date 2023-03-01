@@ -152,7 +152,7 @@ export function Landing() {
             </Text>
           </VStack>
 
-          <ConnectWallet />
+          {/* <ConnectWallet /> */}
 
           <Button onClick={unstoppableLogin} className={styles.connectButton}>
             Connect with Unstoppable Domains
