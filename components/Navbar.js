@@ -51,8 +51,14 @@ const Navbar = ({ user, serUser, userUD }) => {
       <VStack w="100%">
         <HStack className={styles.navbar}>
           <Link href="/">
-            <h1 className={styles.sooth}>Flow Learning Resources</h1>
+            <Image
+              src="/logo2.png"
+              alt="Logo"
+              cursor="pointer"
+              className={styles.logo}
+            ></Image>
           </Link>
+
           <HStack className={styles.navLeftSection}>
             <Link href="/tasks">
               <Text className="text-[#38E8C6]">Tasks</Text>

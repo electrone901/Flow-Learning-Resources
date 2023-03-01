@@ -17,7 +17,6 @@ import {
 import { useState, useContext, useEffect } from 'react'
 import styles from '../styles/Home.module.css'
 import withTransition from './withTransition'
-import ConnectWallet from './web3/ConnectWallet'
 import { MyAppContext } from '../pages/_app'
 import { ethers } from 'ethers'
 import { ABI } from '../abis/ABI'

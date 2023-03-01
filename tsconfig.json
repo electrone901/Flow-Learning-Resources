@@ -25,7 +25,10 @@
     "components/CreateContentFirstPart.js",
     "components/PartnerCard.js",
     "components/RewardPill.js",
-    "pages/community.js"
+    "pages/community.js",
+    "components/Quiz.js",
+    "pages/quest/[id].js",
+    "pages/profile.js"
   ],
   "exclude": ["node_modules"]
 }

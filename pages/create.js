@@ -16,7 +16,8 @@ import { useRouter } from 'next/router'
 import CreateContentFirstPart from '../components/CreateContentFirstPart'
 import withTransition from '../components/withTransition'
 import { apiKey } from '../components/APIKEYS'
-import { MyAppContext } from './_app'
+import * as fcl from '@onflow/fcl'
+import '../flow/config.js'
 
 const CustomeInput = ({ setTempOption }) => {
   return (
@@ -30,40 +31,35 @@ const CustomeInput = ({ setTempOption }) => {
   )
 }
 
-function Create() {
+function Create({ user }) {
   // const { account, contract } = useContext(MyAppContext)
   const dummyData = [
     {
-      question: 'How do you connect to the Klaytn blockchain?',
+      question: 'What is Flow?',
       answers: [
-        'You can connect to the Klaytn blockchain by installing the Klaytn Wallet app on your mobile device or by using a browser extension like MetaMask on your desktop.',
-        'You can connect to the Klaytn blockchain by connecting to a public node using an API or by running your own node and connecting to it.',
-        'You can connect to the Klaytn blockchain by sending a connection request to the Klaytn team and waiting for their approval.',
-        'You can connect to the Klaytn blockchain by purchasing a Klaytn token and using it to access the network.',
+        'Proof of Stake',
+        'Sharding',
+        'Coffe Beans',
+        'Data Availability',
       ],
       correct: 1,
     },
     {
-      question:
-        'What do you need to consider when connecting to the Klaytn blockchain?',
-      answers: [
-        'You need to consider the type of node you want to connect to (e.g. public or private) and whether you want to use an API or run your own node.',
-        'You need to consider the type of device you are using and whether it is compatible with the Klaytn Wallet app or a browser extension like MetaMask.',
-        'You need to consider the amount of Klaytn tokens you have and whether you have enough to access the network.',
-        'All of the above.',
-      ],
-      correct: 4,
+      question: 'Flow is what kind of blockchain?',
+      answers: ['Layer 0', 'Layer 1', 'Layer 3', 'Layer 4'],
+      correct: 2,
     },
 
     {
-      question: 'What is the Klaytn Wallet app?',
+      question:
+        'What are the four phases Flow split the miner/validator role into?',
       answers: [
-        'The Klaytn Wallet app is a mobile app that allows you to manage your Klaytn accounts, send and receive KLAY tokens, and interact with dApps on the Klaytn blockchain.',
-        'The Klaytn Wallet app is a desktop application that allows you to connect to the Klaytn blockchain and manage your KLAY tokens.',
-        'The Klaytn Wallet app is a browser extension that allows you to connect to the Klaytn blockchain and interact with dApps.',
-        'The Klaytn Wallet app is a tool for developers to test and debug their dApps on the Klaytn blockchain.',
+        'Collection - Retention - Execution - Verification',
+        'Collection - Consensus - Expectation - Validation',
+        'Collection - Consensus - Execution - Verification',
+        'Collection - Collection - Expectation - Collection',
       ],
-      correct: 1,
+      correct: 3,
     },
   ]
   const [creatingQuiz, setCreatingQuiz] = useState(false)
@@ -80,6 +76,7 @@ function Create() {
   const router = useRouter()
   const toast = useToast()
   const [isLoading, setLoading] = useState(false)
+  const [tx, setTx] = useState('')
 
   // Second part
   const [data, setData] = useState([])
@@ -92,70 +89,102 @@ function Create() {
   const [optionList, setOptionList] = useState([])
 
   const SaveAllAndPublish = async () => {
-    if (!account || !contract) alert('Please connect your wallet!')
-    try {
-      setCreatingQuiz(true)
-      setLoading(true)
-      const rewardAmountInt = Number(rewardAmount)
-      const subscriptionFeeInt = Number(subscriptionFee)
+    if (user.loggedIn) {
+      try {
+        setCreatingQuiz(true)
+        setLoading(true)
+        const rewardAmountInt = Number(rewardAmount)
+        const subscriptionFeeInt = Number(subscriptionFee)
 
-      const obj = {
-        image: image
-          ? image
-          : 'https://images.unsplash.com/photo-1534705867302-2a41394d2a3b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80',
+        const obj = {
+          image: image
+            ? image
+            : 'https://images.unsplash.com/photo-1534705867302-2a41394d2a3b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80',
 
-        title: title ? title : 'KLAYTN 2022: A YEAR QUIZ',
-        description: description
-          ? description
-          : 'Klaynt Basics concepts to get started in your journey with Klaynt.',
-        rewardAmount: rewardAmount ? rewardAmount : '0.99 USDC',
-        experiencePoint: experiencePoint ? experiencePoint : '100XP',
-        level: level ? level : 1,
-        creator: account
-          ? account
-          : '0xf4eA652F5B7b55f1493631Ea4aFAA63Fe0acc27C',
-        subscriptionFee: subscriptionFee ? subscriptionFee : '0.2',
-        questionsArray: data ? data : dummyData,
-      }
-
-      const client = new NFTStorage({ token: apiKey })
-      const metadata = await client.store({
-        name: title ? title : 'Getting Started with Klaynt Basics',
-        description: JSON.stringify(obj),
-        image: new File([image], 'imageName', { type: 'image/*' }),
-      })
-
-      if (metadata) {
-        const url = metadata?.url.substring(7)
-        const fullUrl = `https://cloudflare-ipfs.com/ipfs/${url}`
-        console.log('fullUrl', fullUrl)
-        const isProject = false
-        const arrayAnswers = [1, 4, 1]
-        const saveToContract = await contract.addTask(
-          fullUrl,
-          rewardAmountInt,
-          subscriptionFeeInt,
-          isProject,
-          arrayAnswers,
-          { value: ethers.utils.parseEther(rewardAmount) },
-        )
-
-        const tx = await saveToContract.wait()
-        if (tx?.to) {
-          toastCreateTaskSuccess(toast)
-          console.log('___tx__', tx)
-          const transationId = tx?.to
-          console.log('transationId', transationId)
-          const event = contract.on('taskAdded')
-          console.log(event)
-          router.push('/tasks')
+          title: title ? title : 'Understanding the concepts behind Flow',
+          description: description
+            ? description
+            : 'Gas fees and smart contract security can present a huge challenge for you. If you do not write your code perfectly the first time, you will not be able to change it later: This presents a massive security risk.',
+          rewardAmount: rewardAmount ? rewardAmount : '0.00',
+          experiencePoint: experiencePoint ? experiencePoint : '100',
+          level: level ? level : 1,
+          creator: user.addr ? user.addr : '0xb74a263c8ad544b5',
+          subscriptionFee: subscriptionFee ? subscriptionFee : '0.00',
+          questionsArray: dummyData,
         }
 
-        // on  success display a button 'See Transaction'
-        //  href https://baobab.scope.klaytn.com/tx/ + txID 0x014ce3aa8bd20739287837f03d7319159310028e21a6b43f8b90a9ea540279a8
+        const client = new NFTStorage({ token: apiKey })
+        const metadata = await client.store({
+          name: title ? title : 'Getting Started with Klaynt Basics',
+          description: JSON.stringify(obj),
+          image: new File([image], 'imageName', { type: 'image/*' }),
+        })
+
+        if (metadata) {
+          const url = metadata?.url.substring(7)
+          const fullUrl = `https://cloudflare-ipfs.com/ipfs/${url}`
+          console.log('fullUrl', fullUrl)
+          const isProject = false
+          const arrayAnswers = [1, 4, 1]
+
+          const saveToContract = addTask(fullUrl)
+
+          //  await contract.addTask(
+          //   fullUrl,
+          //   rewardAmountInt,
+          //   subscriptionFeeInt,
+          //   isProject,
+          //   arrayAnswers,
+          //   { value: ethers.utils.parseEther(rewardAmount) },
+          // )
+
+          // const tx = await saveToContract.wait()
+          // if (tx?.to) {
+          //   console.log('___tx__', tx)
+          //   const transationId = tx?.to
+          //   console.log('transationId', transationId)
+          //   const event = contract.on('taskAdded')
+          //   console.log(event)
+          //   router.push('/tasks')
+          // }
+
+          // on  success display a button 'See Transaction'
+          //  href https://baobab.scope.klaytn.com/tx/ + txID 0x014ce3aa8bd20739287837f03d7319159310028e21a6b43f8b90a9ea540279a8
+        }
+      } catch (error) {
+        console.log(error)
       }
-    } catch (error) {
-      console.log(error)
+    } else {
+      alert('Please connect your wallet to Flow Network!')
+      router.push('/')
+    }
+  }
+
+  const addTask = async (fullUrl) => {
+    const transactionId = await fcl.mutate({
+      cadence: `
+        import TasksList from 0xDeployer
+        transaction(newURL: String) {
+          prepare(signer: AuthAccount) {
+          }
+          execute {
+            TasksList.addTask(newURL: newURL)
+          }
+        }
+        `,
+      args: (arg, t) => [arg(fullUrl, t.String)],
+      proposer: fcl.authz,
+      payer: fcl.authz,
+      authorizations: [fcl.authz],
+      limit: 999,
+    })
+
+    console.log('Transaction Id IS THIS ONE', transactionId)
+    if (transactionId) {
+      const txLink = `https://flow-view-source.com/testnet/tx/${transactionId}`
+      setTx(txLink)
+      setLoading(false)
+      toastCreateTaskSuccess(toast)
     }
   }
 
@@ -324,6 +353,33 @@ function Create() {
                 </VStack>
               ) : (
                 ''
+              )}
+              {tx && (
+                <div
+                  style={{
+                    backgroundColor: 'white',
+                    color: 'black',
+                    padding: '3rem',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: '1.2rem',
+                      color: 'black',
+                    }}
+                  >
+                    🎉 Congratulations... We have successfully created your
+                    quest task.
+                  </p>
+                  <a
+                    href={tx}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="pt-4 underline decoration-sky-900"
+                  >
+                    See Transaction Details
+                  </a>
+                </div>
               )}
             </>
           )}

@@ -11,177 +11,65 @@ import {
   Spinner,
 } from '@chakra-ui/react'
 import { CopyIcon } from '@chakra-ui/icons'
-import Landing from '@components/Landing'
-import { useTron } from '@components/TronProvider'
-import withTransition from '@components/withTransition'
+import withTransition from '../components/withTransition'
 import { useCallback, useEffect, useMemo, useState, useContext } from 'react'
-import { MyAppContext } from '../pages/_app'
-import styles from '@styles/Profile.module.css'
-import PartnerCard from '@components/PartnerCard'
-import { abridgeAddress } from '@utils/abridgeAddress'
-
-import RewardPill from '@components/RewardPill'
-import Error404 from '@components/404'
+import styles from '../styles/Profile.module.css'
+import PartnerCard from '../components/PartnerCard'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-const JOURNEY_API_URL =
-  process.env.NEXT_PUBLIC_ENV === 'prod'
-    ? process.env.NEXT_PUBLIC_API_PROD
-    : process.env.NEXT_PUBLIC_API_DEV
-
-function Profile() {
-  const { address } = useTron()
+function Profile({ user }) {
   const router = useRouter()
-  const {
-    account,
-    setAccount,
-    contract,
-    setContract,
-    provider,
-    setProvider,
-    signer,
-    setSigner,
-    allTasks,
-    setAllTasks,
-  } = useContext(MyAppContext)
+  const [fetchedUser, setFetchedUser] = useState()
+  const [fetchedQuests, setFetchedQuests] = useState([])
+  const [isQuestsLoading, setQuestsLoading] = useState(false)
+  const [isUserLoading, setUserLoading] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [newUsername, setNewUsername] = useState('')
 
-  const [fetchedUser, setFetchedUser] = useState<any>()
-  const [fetchedQuests, setFetchedQuests] = useState<any[]>([])
-  const [isQuestsLoading, setQuestsLoading] = useState<boolean>(false)
-  const [isUserLoading, setUserLoading] = useState<boolean>(false)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [newUsername, setNewUsername] = useState<string>('')
-
-  const connectTwitter = useCallback(
-    (e: any) => {
-      e.preventDefault()
-      router.push('/twitter')
-    },
-    [router],
-  )
-
-  const goToExplore = useCallback(
-    (e: any) => {
-      e.preventDefault()
-      router.push('/')
-    },
-    [router],
-  )
-
-  const fetchQuests = useCallback(async () => {
-    setQuestsLoading(true)
-    try {
-      const response = await fetch(`${JOURNEY_API_URL}/api/quests`)
-      if (response.status === 200) {
-        const { quests } = await response.json()
-        setFetchedQuests(quests)
-      }
-    } catch (err) {
-      console.log(err)
-    }
-    setQuestsLoading(false)
-  }, [])
-
-  const fetchUser = useCallback(async () => {
-    if (!address) return
-    setUserLoading(true)
-    try {
-      const response = await fetch(`${JOURNEY_API_URL}/api/users/${address}`)
-      if (response.status === 200) {
-        const user = await response.json()
-        setFetchedUser(user)
-      }
-    } catch (err) {
-      console.log(err)
-    }
-    setUserLoading(false)
-  }, [address])
+  // const fetchUser = useCallback(async () => {
+  //   if (!address) return
+  //   setUserLoading(true)
+  //   try {
+  //     const response = await fetch(`${JOURNEY_API_URL}/api/users/${address}`)
+  //     if (response.status === 200) {
+  //       const user = await response.json()
+  //       setFetchedUser(user)
+  //     }
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  //   setUserLoading(false)
+  // }, [address])
 
   function handleUsernameChange(e) {
     e.preventDefault()
     setNewUsername(e.target.value)
   }
 
-  const updateUsername = useCallback(async () => {
-    try {
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          address: address,
-          newUsername: newUsername,
-        }),
-      }
-
-      const response = await fetch(
-        `${JOURNEY_API_URL}/api/users/username`,
-        requestOptions,
-      )
-
-      if (response.status === 200) {
-        await fetchUser()
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }, [address, fetchUser, newUsername])
-
-  async function handleEditMode() {
-    if (isEditing) {
-      await updateUsername()
-      setIsEditing(false)
-    } else {
-      setIsEditing(true)
-    }
-  }
+  // useEffect(() => {
+  //   if (!fetchedUser) {
+  //     fetchUser()
+  //   }
+  //   if (fetchedQuests.length === 0) {
+  //     fetchQuests()
+  //   }
+  // }, [fetchQuests, fetchUser, fetchedQuests, fetchedUser])
 
   useEffect(() => {
-    if (!fetchedUser) {
-      fetchUser()
+    if (user.loggedIn) {
+    } else {
+      alert('Please connect your wallet to Flow Network!')
+      router.push('/')
     }
-    if (fetchedQuests.length === 0) {
-      fetchQuests()
-    }
-  }, [fetchQuests, fetchUser, fetchedQuests, fetchedUser])
+  }, [])
 
-  const completedQuests = useMemo(() => {
-    if (!fetchedUser || fetchedQuests.length === 0) return []
-    const userQuests = Object.keys(fetchedUser.quests)
-    const completedQuestIds = userQuests.filter(
-      (questId) => fetchedUser.quests[questId].status === 'rewarded',
-    )
-    return fetchedQuests.filter((quest) => completedQuestIds.includes(quest.id))
-  }, [fetchedQuests, fetchedUser])
-
-  const username = useMemo(() => {
-    if (!fetchedUser) return ''
-    return fetchedUser.username
-  }, [fetchedUser])
-
-  const isJourneyCompleted = useMemo(() => {
-    let completed
-    if (fetchedQuests.length === 0) return false
-    fetchedQuests.forEach((q) => {
-      if (q.id === 'SOEKIWe2g0JDOKTZBl6N') {
-        if (q.completed_users.includes(address)) {
-          completed = true
-        }
-      }
-    })
-    return completed
-  }, [address, fetchedQuests])
-
-  if (!account) return <Landing />
-
-  if (isUserLoading || isQuestsLoading)
-    return (
-      <VStack className={styles.loadingContainer}>
-        <Spinner color="white" size="xl" />
-      </VStack>
-    )
-
-  // if (!fetchedUser || fetchedQuests.length === 0) return <Error404 />
+  // if (isUserLoading || isQuestsLoading)
+  // return (
+  //   <VStack className={styles.loadingContainer}>
+  //     <Spinner color="white" size="xl" />
+  //   </VStack>
+  // )
 
   const data = [
     {
@@ -304,9 +192,9 @@ function Profile() {
         alt="userImage"
       />
       <div className={styles.profileItem}>
-        <p className={styles.profileParaghap}>Task completed: 6 </p>
+        <p className={styles.profileParaghap}>Task completed: 100 </p>
         <p className={styles.profileParaghap}>
-          0x5e1b802905c9730C8474eED020F800CC38A6A42E
+          {user.addr}
           <CopyIcon style={{ marginLeft: '.8rem' }} />
         </p>
       </div>
@@ -319,7 +207,7 @@ function Profile() {
             paddingTop: '2rem',
           }}
         >
-          All completed tasks details.
+          Suggested Quest Tasks to increased your reputation and points.
         </h1>
 
         <SimpleGrid columns={2} gap={5} pt={10}>

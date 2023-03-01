@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import RewardPill from './RewardPill'
 
 export default function QuestCard({ task, handleClick, isLocked }) {
+
   return (
     <HStack
       className={isLocked ? styles.lockedQuest : styles.questCard}
@@ -14,7 +15,7 @@ export default function QuestCard({ task, handleClick, isLocked }) {
             borderRadius="full"
             boxSize="120px"
             src={task.image ? task.image : '/coin.svg'}
-            alt="Dan Abramov"
+            alt="Bounty image"
           />
 
           <VStack alignItems="flex-start">
@@ -24,19 +25,15 @@ export default function QuestCard({ task, handleClick, isLocked }) {
             </Text>
             <HStack>
               <RewardPill imageUrl="/l.png" label={`Level: ${task.level}`} />
-              {/* <RewardPill imageUrl="/coin.png" label={task.reward} /> */}
               <RewardPill
                 imageUrl="/coin.png"
-                label={`Rewards: ${task.reward} klay`}
+                label={`Rewards: ${task.reward} Flow`}
               />
               <RewardPill
                 imageUrl="/badgeicon.png"
-                label={task.experiencePoint}
+                label={`XP: ${task.experiencePoint}`}
               />
-              <RewardPill
-                imageUrl="/badgeicon.png"
-                label={`Entry fee: ${task.price} klay`}
-              />
+              <RewardPill imageUrl="/dollar.png" label={`Entry fee: Free`} />
             </HStack>
           </VStack>
         </HStack>

@@ -1,4 +1,20 @@
 export const dummyQuests = [
+
+
+  {
+    title: 'DEX 101 with SunSwap',
+    description:
+      'Explore swapping, LPing on SunSwap, and staking on TRON with SunSwap',
+    image_url: '/nft_suncurve.png',
+  },
+  {
+    title: 'Stables on SunCurve',
+    description: 'Swap from USDD to USDT on SunCurve Protocol',
+    image_url: '/nft_suncurve.png',
+  },
+
+
+  
   {
     title: 'DEX 101 with SunSwap',
     description:
