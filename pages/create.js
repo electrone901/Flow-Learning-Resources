@@ -18,6 +18,8 @@ import withTransition from '../components/withTransition'
 import { apiKey } from '../components/APIKEYS'
 import * as fcl from '@onflow/fcl'
 import '../flow/config.js'
+import ABI from '../contract/ABI.json'
+console.log('🚀 ~ file: create.js:22 ~ ABI:', ABI)
 
 const CustomeInput = ({ setTempOption }) => {
   return (

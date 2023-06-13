@@ -1,7 +1,7 @@
 const JOURNEY_API_URL =
   process.env.NEXT_PUBLIC_ENV === 'prod'
     ? process.env.NEXT_PUBLIC_API_PROD
-    : process.env.NEXT_PUBLIC_API_DEV
+    : process.env._API_DEV
 
 async function fetchUser(address: string) {
   if (!address) return

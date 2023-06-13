@@ -17,6 +17,12 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import * as fcl from '@onflow/fcl'
 import '../flow/config.js'
+import {
+  GaslessOnboarding,
+  GaslessWalletConfig,
+  GaslessWalletInterface,
+  LoginConfig,
+} from '@gelatonetwork/gasless-onboarding'
 
 export default function Home({ Component, pageProps, router }) {
   const [user, setUser] = useState({ loggedIn: false })
@@ -26,6 +32,38 @@ export default function Home({ Component, pageProps, router }) {
   useEffect(() => {
     fcl.currentUser().subscribe(setUser)
   }, [])
+
+  async function mylogin() {
+    const gaslessWalletConfig = {
+      apiKey: 'KP1FEqk_oaJpGhrGPD5f4QCzVFB3oIJN_nNbJmIUSHE_',
+    }
+    const loginConfig = {
+      domains: ['http://localhost:3000/'],
+      chain: {
+        id: 5,
+        rpcUrl:
+          'https://eth-goerli.g.alchemy.com/v2/wfmZ5V7AL4unxjEHUIfgeSAlxX3Pl0fx',
+      },
+      openLogin: {
+        redirectUrl: `http://localhost:3000/`,
+      },
+    }
+    const gaslessOnboarding = new GaslessOnboarding(
+      loginConfig,
+      gaslessWalletConfig,
+    )
+    console.log(
+      '🚀 ~ file: index.js:52 ~ mylogin ~ gaslessOnboarding:',
+      gaslessOnboarding,
+    )
+    await gaslessOnboarding.init()
+    const web3AuthProvider = await gaslessOnboarding.login()
+    console.log('🚀web3AuthProvider:', web3AuthProvider)
+
+    const gaslessWallet = gaslessOnboarding.getGaslessWallet()
+    const address = gaslessWallet.getAddress()
+    console.log('🚀 ~ file: index.js:63 ~ mylogin ~ address:', address)
+  }
 
   async function getGreeting() {
     const result = await fcl.query({
@@ -107,6 +145,8 @@ export default function Home({ Component, pageProps, router }) {
             <h1>Learning rewards is simple, educational, and rewarding.</h1>
             <p></p>
             <p>Learn and earn tokens, NFTS, and Experience points.</p>
+
+            <Button onClick={mylogin}>mylogin</Button>
 
             <Button
               fontSize={'bg'}
